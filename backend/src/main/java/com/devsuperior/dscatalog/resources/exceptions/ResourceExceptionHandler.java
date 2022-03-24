@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.devsuperior.dscatalog.services.exceptions.EntityNotFoundException;
 
-//Método que interceptará o controller e tratará a excessão
+//Método que interceptará o controller e tratará a excessão personalizada
 @ControllerAdvice
 public class ResourceExceptionHandler {
 
 	//Será necessária essa anotation com o parametro sendo a classe da nossa excessão
-	//nesse caso a classe que criamos EntityN
+	//nesse caso a classe que criamos EntityNotFoundException
 	@ExceptionHandler(EntityNotFoundException.class)	
 	public ResponseEntity<StandardError> entityNotFound(EntityNotFoundException e, HttpServletRequest request){
 		StandardError err = new StandardError();

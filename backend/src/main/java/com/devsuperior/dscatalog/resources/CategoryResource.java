@@ -52,6 +52,9 @@ public class CategoryResource {
 	@PostMapping
 	public ResponseEntity<CategoryDTO> insert(@RequestBody CategoryDTO dto) {
 		dto = service.insert(dto);
+		
+		//Restornará o codigo 201 e também um parametro adicional no cabeçalho da resposta 
+		//que será o endereço do novo recurso criado
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/categories/{id}").buildAndExpand(dto.getId())
 				.toUri();
 		return ResponseEntity.created(uri).body(dto);

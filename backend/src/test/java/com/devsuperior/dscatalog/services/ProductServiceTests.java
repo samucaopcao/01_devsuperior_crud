@@ -13,10 +13,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.devsuperior.dscatalog.dto.ProductDTO;
 import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DataBaseException;
@@ -152,6 +155,26 @@ public class ProductServiceTests {
 		});
 
 		Mockito.verify(repository, Mockito.times(1)).deleteById(dependentId);
+	}
+
+	@Test
+	public void fidAllPagedShouldReturnPage() {
+
+		Pageable pageable = PageRequest.of(0, 10);
+
+		Page<ProductDTO> result = service.findAllPaged(pageable);
+
+		// Observamos que o findAll já está simulado na linha 78
+		// deste modo o meu objeto mockado vai retornar uma página mesmo
+		// não sendo assim nula
+
+		Assertions.assertNotNull(result);
+
+		// E esse verify dara verdadeiro pois la no meu service
+		// realmente estou chamando o findAll
+
+		Mockito.verify(repository, Mockito.times(1)).findAll(pageable);
+
 	}
 
 }

@@ -1,19 +1,27 @@
 package com.devsuperior.dscatalog.services;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DataBaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
+import com.devsuperior.dscatalog.tests.FactoryProduct;
 
 //Quando vamos testar componentes isolados 
 //ou seja teste de unidade em service ou component
@@ -41,6 +49,9 @@ public class ProductServiceTests {
 	private long existId;
 	private long nonExistingId;
 	private long dependentId;
+	// Esse é um tipo concreto que representa uma página
+	private PageImpl<Product> page;
+	Product product;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -50,10 +61,33 @@ public class ProductServiceTests {
 		// anotation @BeforeEach
 
 		existId = 1L;
-		nonExistingId = 1000L;
-		dependentId = 4;
+		nonExistingId = 2L;
+		dependentId = 3L;
+		product = FactoryProduct.createProduct();
+		page = new PageImpl<>(List.of(product));
 
-		// Configurando o comportamento simulado do @Mock (linha 31)
+		// Quando o metodo tem um RETORNO o WHEN vem primeiro
+		// Neste exemplo quando chamar o findAll do Repository
+		// passando um objeto qualquer usando ArgumentMatchers.any()
+		// do tipo Pageable deverá retornar
+		// um page que é uma lista de páginas
+
+		Mockito.when(repository.findAll((Pageable) ArgumentMatchers.any())).thenReturn(page);
+
+		// Quando chamar o repository.savepassando um objeto qualquer usando
+		// ArgumentMatchers.any()
+		// retorne um produto
+
+		Mockito.when(repository.save(ArgumentMatchers.any())).thenReturn(product);
+
+		// Quando chamar o repository.findById com um id existente
+		// retorne um Optional de produto, já se o id for inexistente
+		// retorno um Optional vazio
+
+		Mockito.when(repository.findById(existId)).thenReturn(Optional.of(product));
+		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
+
+		// Configurando o comportamento simulado do @Mock (linha 38)
 		// no nosso caso ele nao retorna nada usamos o doNothing e quando
 		// (when) usamos o mock( nosso repository) chamando o metodo deleteById
 		// com um id existente ele não deve fazer nada
@@ -79,12 +113,13 @@ public class ProductServiceTests {
 	public void deletShouldNothingWhenIdExists() {
 
 		// Testamos o metodo delete e não deve retornar uma exceção
+
 		Assertions.assertDoesNotThrow(() -> {
 			service.delete(existId);
 		});
 
 		// Neste ponto estamos fazendo o Assertion ou seja
-		// vendo se nosso mock (repository da linha 31) esta configurado e
+		// vendo se nosso mock (repository da linha 38) esta configurado e
 		// realizou a chamada no metodo proposto, posso também usar alguma
 		// sobrecarga do Mockito como Mockito.times(2) nesse caso aqui sugere
 		// que meu metodo deleteById deveria passar 1 vez

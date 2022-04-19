@@ -7,10 +7,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.devsuperior.dscatalog.repositories.ProductRepository;
+import com.devsuperior.dscatalog.services.exceptions.DataBaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 
 //Quando vamos testar componentes isolados 
@@ -38,6 +40,7 @@ public class ProductServiceTests {
 
 	private long existId;
 	private long nonExistingId;
+	private long dependentId;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -48,6 +51,7 @@ public class ProductServiceTests {
 
 		existId = 1L;
 		nonExistingId = 1000L;
+		dependentId = 4;
 
 		// Configurando o comportamento simulado do @Mock (linha 31)
 		// no nosso caso ele nao retorna nada usamos o doNothing e quando
@@ -59,7 +63,12 @@ public class ProductServiceTests {
 		// Quando chamo um id não existente crio o comportamento para uma excessão
 
 		Mockito.doThrow(EmptyResultDataAccessException.class).when(repository).deleteById(nonExistingId);
-		;
+
+		// Nosso repositorio mostrará essa exceção quando tentar deletar um id que tem
+		// outra entidade que depende dele
+
+		Mockito.doThrow(DataIntegrityViolationException.class).when(repository).deleteById(dependentId);
+
 	}
 
 	// Como devemos testar a classe isolada nosso service
@@ -95,6 +104,19 @@ public class ProductServiceTests {
 		});
 
 		Mockito.verify(repository, Mockito.times(1)).deleteById(nonExistingId);
+	}
+
+	@Test
+	public void deletShouldThrowDataBaseExceptionWhenDependentId() {
+
+		// Se eu tentar excluir um id que outra entidade depende dele
+		// o service chamara a exceção DataBaseException
+
+		Assertions.assertThrows(DataBaseException.class, () -> {
+			service.delete(dependentId);
+		});
+
+		Mockito.verify(repository, Mockito.times(1)).deleteById(dependentId);
 	}
 
 }

@@ -2,6 +2,7 @@ package com.devsuperior.dscatalog.services;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -10,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.devsuperior.dscatalog.repositories.ProductRepository;
+import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 
 //Quando vamos testar componentes isolados 
 //ou seja teste de unidade em service ou component
@@ -64,9 +66,10 @@ public class ProductServiceTests {
 	// não poderá conversar com o repository ou seja o delete
 	// não fará nada somente a chamada
 
+	@Test
 	public void deletShouldNothingWhenIdExists() {
 
-		//Testamos o metodo delete e não deve retornar uma exceção
+		// Testamos o metodo delete e não deve retornar uma exceção
 		Assertions.assertDoesNotThrow(() -> {
 			service.delete(existId);
 		});
@@ -79,6 +82,19 @@ public class ProductServiceTests {
 		// já o Mockito.never() quer dizer que o metodo nunca pode ser chamado
 
 		Mockito.verify(repository, Mockito.times(1)).deleteById(existId);
+	}
+
+	@Test
+	public void deletShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
+
+		// Se eu chamar um id que não existe o service chamara a exceção
+		// ResourceNotFoundException
+
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.delete(nonExistingId);
+		});
+
+		Mockito.verify(repository, Mockito.times(1)).deleteById(nonExistingId);
 	}
 
 }

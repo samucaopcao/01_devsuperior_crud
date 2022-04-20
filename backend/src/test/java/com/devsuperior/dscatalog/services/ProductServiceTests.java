@@ -49,12 +49,14 @@ public class ProductServiceTests {
 	@Mock
 	private ProductRepository repository;
 
-	private long existId;
+	private long existingId;
 	private long nonExistingId;
 	private long dependentId;
+
 	// Esse é um tipo concreto que representa uma página
 	private PageImpl<Product> page;
 	Product product;
+	ProductDTO productDTO;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -63,7 +65,7 @@ public class ProductServiceTests {
 		// para que não precise repetir esses atributos a cada teste usamos a
 		// anotation @BeforeEach
 
-		existId = 1L;
+		existingId = 1L;
 		nonExistingId = 2L;
 		dependentId = 3L;
 		product = FactoryProduct.createProduct();
@@ -87,7 +89,7 @@ public class ProductServiceTests {
 		// retorne um Optional de produto, já se o id for inexistente
 		// retorno um Optional vazio
 
-		Mockito.when(repository.findById(existId)).thenReturn(Optional.of(product));
+		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
 		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
 
 		// Configurando o comportamento simulado do @Mock (linha 38)
@@ -95,7 +97,7 @@ public class ProductServiceTests {
 		// (when) usamos o mock( nosso repository) chamando o metodo deleteById
 		// com um id existente ele não deve fazer nada
 
-		Mockito.doNothing().when(repository).deleteById(existId);
+		Mockito.doNothing().when(repository).deleteById(existingId);
 
 		// Quando chamo um id não existente crio o comportamento para uma excessão
 
@@ -118,7 +120,7 @@ public class ProductServiceTests {
 		// Testamos o metodo delete e não deve retornar uma exceção
 
 		Assertions.assertDoesNotThrow(() -> {
-			service.delete(existId);
+			service.delete(existingId);
 		});
 
 		// Neste ponto estamos fazendo o Assertion ou seja
@@ -128,7 +130,7 @@ public class ProductServiceTests {
 		// que meu metodo deleteById deveria passar 1 vez
 		// já o Mockito.never() quer dizer que o metodo nunca pode ser chamado
 
-		Mockito.verify(repository, Mockito.times(1)).deleteById(existId);
+		Mockito.verify(repository, Mockito.times(1)).deleteById(existingId);
 	}
 
 	@Test
@@ -158,7 +160,7 @@ public class ProductServiceTests {
 	}
 
 	@Test
-	public void fidAllPagedShouldReturnPage() {
+	public void findAllPagedShouldReturnPage() {
 
 		Pageable pageable = PageRequest.of(0, 10);
 
@@ -175,6 +177,27 @@ public class ProductServiceTests {
 
 		Mockito.verify(repository, Mockito.times(1)).findAll(pageable);
 
+	}
+
+	@Test
+	public void findByIdShouldReturnProductDTOWhenIdExists() {
+
+		ProductDTO result = service.findById(existingId);
+
+		Assertions.assertNotNull(result);
+
+		Mockito.verify(repository, Mockito.times(1)).findById(existingId);
+
+	}
+
+	@Test
+	public void findByIdShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
+
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.findById(nonExistingId);
+		});
+
+		Mockito.verify(repository, Mockito.times(1)).findById(nonExistingId);
 	}
 
 }

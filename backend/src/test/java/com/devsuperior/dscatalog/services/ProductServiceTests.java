@@ -3,6 +3,8 @@ package com.devsuperior.dscatalog.services;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
+import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.entities.Product;
+import com.devsuperior.dscatalog.repositories.CategoryRepository;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DataBaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
@@ -49,17 +53,33 @@ public class ProductServiceTests {
 	@Mock
 	private ProductRepository repository;
 
+	@Mock
+	private CategoryRepository categoryRepository;
+
 	private long existingId;
 	private long nonExistingId;
 	private long dependentId;
 
 	// Esse é um tipo concreto que representa uma página
 	private PageImpl<Product> page;
-	Product product;
-	ProductDTO productDTO;
+	private Product product;
+	private ProductDTO productDTO;
+	private Category category;
 
 	@BeforeEach
 	void setUp() throws Exception {
+
+		// Para realizar o update, como no service também usamos o repository do
+		// Category
+		// então ele também será simulado aqui
+		// Quando um id existe
+		Mockito.when(repository.getOne(existingId)).thenReturn(product);
+		// Quando um id não existe
+		Mockito.when(repository.getOne(nonExistingId)).thenThrow(EntityNotFoundException.class);
+
+		Mockito.when(categoryRepository.getOne(existingId)).thenReturn(category);
+		// Quando um id não existe
+		Mockito.when(categoryRepository.getOne(nonExistingId)).thenThrow(EntityNotFoundException.class);
 
 		// Declaro os atributos e objetos que serão usados no teste
 		// para que não precise repetir esses atributos a cada teste usamos a
@@ -69,6 +89,8 @@ public class ProductServiceTests {
 		nonExistingId = 2L;
 		dependentId = 3L;
 		product = FactoryProduct.createProduct();
+		category = FactoryProduct.createCategory();
+		productDTO = FactoryProduct.createProductDTO();
 		page = new PageImpl<>(List.of(product));
 
 		// Quando o metodo tem um RETORNO o WHEN vem primeiro
@@ -198,6 +220,24 @@ public class ProductServiceTests {
 		});
 
 		Mockito.verify(repository, Mockito.times(1)).findById(nonExistingId);
+	}
+
+	@Test
+	public void updateShouldReturnProductDTOWhenIdExists() {
+
+		ProductDTO result = service.update(existingId, productDTO);
+
+		Assertions.assertNotNull(result);
+
+	}
+
+	@Test
+	public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
+
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.update(nonExistingId, productDTO);
+		});
+
 	}
 
 }

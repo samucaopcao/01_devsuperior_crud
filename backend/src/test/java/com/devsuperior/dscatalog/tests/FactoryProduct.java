@@ -21,6 +21,6 @@ public class FactoryProduct {
 	}
 
 	public static Category createCategory() {
-		return new Category(2L, "Electronics");
+		return new Category(1L, "Electronics");
 	}
 }

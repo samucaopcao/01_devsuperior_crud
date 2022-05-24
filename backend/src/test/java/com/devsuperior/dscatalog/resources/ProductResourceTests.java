@@ -4,7 +4,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -88,7 +90,44 @@ public class ProductResourceTests {
 		// Traga a exceção DataBaseException quando tentar excluir um id que depende de outro
 		doThrow(DataBaseException.class).when(service).delete(dependentId);
 		
+		// Insert 
+		when(service.insert(ArgumentMatchers.any())).thenReturn(productDTO);
+		
 	}
+	//---EXERCICIO--
+	
+	@Test
+	public void insertShouldReturnProductDTOCreated() throws Exception {
+		
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		ResultActions result = mockyMvc.perform(post("/products")
+				.content(jsonBody)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isCreated());
+		
+	}
+	
+	@Test
+	public void deleteShouldReturnNoContentWhenIdExists() throws Exception {
+		ResultActions result = mockyMvc.perform(delete("/products/{id}", existingId).accept(MediaType.APPLICATION_JSON));
+
+		result.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void deleteShouldReturnNotFoundWhenIdNotExists() throws Exception {
+		ResultActions result = mockyMvc
+				.perform(delete("/products/{id}", nonExistingId).accept(MediaType.APPLICATION_JSON));
+
+		result.andExpect(status().isNotFound());
+		
+	}
+	
+	//---EXERCICIO--
+	
 
 	@Test
 	// Agora sim conseguiremos testar o controller depois de simular o service

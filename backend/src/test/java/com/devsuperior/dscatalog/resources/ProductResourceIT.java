@@ -90,28 +90,25 @@ public class ProductResourceIT {
 		result.andExpect(jsonPath("$.name").value(expectedName));
 		result.andExpect(jsonPath("$.description").value(expectedDescription));
 	}
-	
+
 	@Test
 	// Como o Put é uma requisição que deve ter corpo mas na requisição deve ser um
 	// tipo de objeto JSON, deste modo temos que converter o objeto java para JSON
 	// usando
 	// o ObjectMapper
-	public void updateShouldReturnProductDTOWhenIdExists() throws Exception {
+	public void updateShouldReturnProductDTOWhenIdDoesNotExist() throws Exception {
 
 		ProductDTO productDTO = FactoryProduct.createProductDTO();
 		// Convertendo um objeto java em String
 		String jsonBody = objectMapper.writeValueAsString(productDTO);
 
-		String expectedName = productDTO.getName();
-		String expectedDescription = productDTO.getDescription();
 
-		// Estou atualizando o valor aqui do produto do id existente
-		ResultActions result = mockMvc.perform(put("/products/{id}", existingId).content(jsonBody)
+		// Estou atualizando o valor aqui do produto do id não existente
+		ResultActions result = mockMvc.perform(put("/products/{id}", nonExistingId).content(jsonBody)
 				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
 
-		// Vejo se a resposta veio OK e com os valores esperados
-		result.andExpect(status().isOk());
-	
-	
+		// Vejo se a resposta veio como NotFound
+		result.andExpect(status().isNotFound());
+	}
 
 }

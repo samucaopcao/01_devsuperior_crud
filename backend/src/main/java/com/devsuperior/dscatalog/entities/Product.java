@@ -33,6 +33,7 @@ public class Product implements Serializable {
 	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")//Para que o BD reconheça como UTC
 	private Instant date;
 
+	// Quando usamos muito para muitos uma terceira tabela será criada a partir do Mapeamento
 	@ManyToMany
 	@JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
 	private Set<Category> categories = new HashSet<>();

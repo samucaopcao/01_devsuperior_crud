@@ -34,7 +34,7 @@ public class ProductDTO implements Serializable {
 		this.date = date;
 	}
 
-	// Posso passar um produto usando um objeto Product
+	// Posso passar um produto usando um objeto Product deixando a lista de categorias vazia
 	public ProductDTO(Product entity) {
 		this.id = entity.getId();
 		this.name = entity.getName();

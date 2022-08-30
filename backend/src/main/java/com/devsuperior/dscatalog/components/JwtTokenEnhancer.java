@@ -1,4 +1,4 @@
-package com.devsuperior.components;
+package com.devsuperior.dscatalog.components;
 
 import java.util.HashMap;
 import java.util.Map;

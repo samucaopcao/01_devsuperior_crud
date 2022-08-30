@@ -28,6 +28,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	
 	private static final String[] ADMIN = { "/users/**" };	
 	
+	
+	// Decodifica o Token e analisa se está válido
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
 		resources.tokenStore(tokenStore);
@@ -42,10 +44,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		}
 		
 		http.authorizeRequests()
-		.antMatchers(PUBLIC).permitAll()
-		.antMatchers(HttpMethod.GET, OPERATOR_OR_ADMIN).permitAll()
-		.antMatchers(OPERATOR_OR_ADMIN).hasAnyRole("OPERATOR", "ADMIN")
-		.antMatchers(ADMIN).hasRole("ADMIN")
-		.anyRequest().authenticated();
+		.antMatchers(PUBLIC).permitAll() // Quem estiver acessando alguma rota desse perfil estão todas permitidas
+		.antMatchers(HttpMethod.GET, OPERATOR_OR_ADMIN).permitAll() // Liberado para todo mundo só o GET
+		.antMatchers(OPERATOR_OR_ADMIN).hasAnyRole("OPERATOR", "ADMIN") // As rotas "products/**", "categories/** só podem ser acessadas pelos perfis OPERATOR ou ADMIN"
+		.antMatchers(ADMIN).hasRole("ADMIN") // Só pode acessar users/ quem for ADMIN
+		.anyRequest().authenticated(); // Somente pode acessar qualquer endpoint quem estiver logado
 	}	
 }

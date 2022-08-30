@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
-import com.devsuperior.components.JwtTokenEnhancer;
+import com.devsuperior.dscatalog.components.JwtTokenEnhancer;
 
 
 // Essa classe que representa o Authorization Server do Oauth

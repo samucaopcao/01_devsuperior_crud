@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
 	@Autowired
-	private Environment env;
+	private Environment env; // Ambiente que roda minha aplicação
 	
 	@Autowired
 	private JwtTokenStore tokenStore;

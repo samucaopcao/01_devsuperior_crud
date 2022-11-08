@@ -70,7 +70,7 @@ public class ProductResourceTests {
 
 		// Quando chamarmos no service o FindAllPaged com qualquer argumento
 		// irá retornar um objeto page que é do tipo productDTO
-		when(service.findAllPaged(ArgumentMatchers.any())).thenReturn(page);
+		when(service.findAllPaged(ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())).thenReturn(page);
 
 		// Quando no meu service eu chamar o findById passando um id existente então
 		// retorne

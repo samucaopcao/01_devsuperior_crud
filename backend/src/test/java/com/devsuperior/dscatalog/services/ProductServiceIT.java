@@ -3,6 +3,7 @@ package com.devsuperior.dscatalog.services;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -74,7 +75,7 @@ public class ProductServiceIT {
 		// conforme abaixo
 		PageRequest pageRequest = PageRequest.of(0, 10);
 		
-		Page<ProductDTO> result = service.findAllPaged(pageRequest);
+		Page<ProductDTO> result = service.findAllPaged( ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
 		
 		// Como sabemos que no nosso BD existem 25 produtos então a página
 		// 0 deve retornar 10 objetos, por isso verificamos inicialmente se não está vazia
@@ -99,7 +100,7 @@ public class ProductServiceIT {
 		// conforme abaixo
 		PageRequest pageRequest = PageRequest.of(50, 10);
 		
-		Page<ProductDTO> result = service.findAllPaged(pageRequest);
+		Page<ProductDTO> result = service.findAllPaged(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
 		
 		// Como sabemos que no nosso BD existem 25 produtos então a página
 		// 50 deve retornar vazia
@@ -115,7 +116,7 @@ public class ProductServiceIT {
 		// e o terceiro a ordenação por nome
 		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("name"));
 		
-		Page<ProductDTO> result = service.findAllPaged(pageRequest);
+		Page<ProductDTO> result = service.findAllPaged(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
 		
 		// Verificando se não esta vazio
 		Assertions.assertFalse(result.isEmpty());

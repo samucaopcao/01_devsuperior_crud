@@ -193,7 +193,7 @@ public class ProductServiceTests {
 
 		Pageable pageable = PageRequest.of(0, 10);
 
-		Page<ProductDTO> result = service.findAllPaged(pageable);
+		Page<ProductDTO> result = service.findAllPaged(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
 
 		// Observamos que o findAll já está simulado na linha 78
 		// deste modo o meu objeto mockado vai retornar uma página mesmo

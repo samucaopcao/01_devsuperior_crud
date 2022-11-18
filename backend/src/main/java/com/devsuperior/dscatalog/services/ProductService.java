@@ -40,8 +40,10 @@ public class ProductService {
 		// instancio ela abaixo, para otimizar tempo vendo se o categoryId não será nulo
 		List<Category> categories = (categoryId == 0) ? null : Arrays.asList(categoryRepository.getOne(categoryId));
 
-		Page<Product> list = repository.find(categories, name, pageable);
-		return list.map(x -> new ProductDTO(x));
+		Page<Product> page = repository.find(categories, name, pageable);
+		//getContent para pegar o conteudo de page 
+		repository.findProductsWithCategories(page.getContent());
+		return page.map(x -> new ProductDTO(x, x.getCategories()));
 
 	}
 

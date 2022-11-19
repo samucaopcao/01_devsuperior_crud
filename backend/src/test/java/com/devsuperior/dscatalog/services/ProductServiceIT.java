@@ -75,7 +75,7 @@ public class ProductServiceIT {
 		// conforme abaixo
 		PageRequest pageRequest = PageRequest.of(0, 10);
 		
-		Page<ProductDTO> result = service.findAllPaged( ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
+		Page<ProductDTO> result = service.findAllPaged(0L,"",pageRequest);
 		
 		// Como sabemos que no nosso BD existem 25 produtos então a página
 		// 0 deve retornar 10 objetos, por isso verificamos inicialmente se não está vazia
@@ -100,7 +100,7 @@ public class ProductServiceIT {
 		// conforme abaixo
 		PageRequest pageRequest = PageRequest.of(50, 10);
 		
-		Page<ProductDTO> result = service.findAllPaged(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
+		Page<ProductDTO> result = service.findAllPaged(0L,"",pageRequest);
 		
 		// Como sabemos que no nosso BD existem 25 produtos então a página
 		// 50 deve retornar vazia
@@ -116,7 +116,7 @@ public class ProductServiceIT {
 		// e o terceiro a ordenação por nome
 		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("name"));
 		
-		Page<ProductDTO> result = service.findAllPaged(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
+		Page<ProductDTO> result = service.findAllPaged(0L,"",pageRequest);
 		
 		// Verificando se não esta vazio
 		Assertions.assertFalse(result.isEmpty());

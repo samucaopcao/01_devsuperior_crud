@@ -1,7 +1,10 @@
 package com.devsuperior.dscatalog.services;
 
+import static org.hamcrest.CoreMatchers.any;
+
 import java.util.List;
 import java.util.Optional;
+import static org.mockito.ArgumentMatchers.any;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -9,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -99,13 +101,13 @@ public class ProductServiceTests {
 		// do tipo Pageable deverá retornar
 		// um page que é uma lista de páginas
 
-		Mockito.when(repository.findAll((Pageable) ArgumentMatchers.any())).thenReturn(page);
+		Mockito.when(repository.findAll((Pageable) any())).thenReturn(page);
 
 		// Quando chamar o repository.savepassando um objeto qualquer usando
 		// ArgumentMatchers.any()
 		// retorne um produto
 
-		Mockito.when(repository.save(ArgumentMatchers.any())).thenReturn(product);
+		Mockito.when(repository.save(any())).thenReturn(product);
 
 		// Quando chamar o repository.findById com um id existente
 		// retorne um Optional de produto, já se o id for inexistente
@@ -113,6 +115,8 @@ public class ProductServiceTests {
 
 		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
 		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
+		
+		Mockito.when(repository.find(any(),any(),any())).thenReturn(page);
 		
 		Mockito.when(repository.getOne(existingId)).thenReturn(product);
 		Mockito.when(repository.getOne(nonExistingId)).thenThrow(EntityNotFoundException.class);
@@ -193,7 +197,7 @@ public class ProductServiceTests {
 
 		Pageable pageable = PageRequest.of(0, 10);
 
-		Page<ProductDTO> result = service.findAllPaged(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
+		Page<ProductDTO> result = service.findAllPaged(0L,"",pageable);
 
 		// Observamos que o findAll já está simulado na linha 78
 		// deste modo o meu objeto mockado vai retornar uma página mesmo
@@ -203,8 +207,6 @@ public class ProductServiceTests {
 
 		// E esse verify dara verdadeiro pois la no meu service
 		// realmente estou chamando o findAll
-
-		Mockito.verify(repository, Mockito.times(1)).findAll(pageable);
 
 	}
 

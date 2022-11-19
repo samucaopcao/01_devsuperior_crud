@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
 import com.devsuperior.dscatalog.tests.FactoryProduct;
+import com.devsuperior.dscatalog.tests.TokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 // Realizaremos o teste de integração e camada web por isso
@@ -32,13 +33,21 @@ public class ProductResourceIT {
 	private Long existingId;
 	private Long nonExistingId;
 	private Long countTotalProducts;
+	private String username;
+	private String password;
 
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private TokenUtil tokenUtil;
 
 	@BeforeEach
 	void setUp() throws Exception {
 
+		username = "maria@gmail.com";
+		password = "123456";
+		
 		existingId = 1L;
 		nonExistingId = 1000L;
 		countTotalProducts = 25L;
@@ -72,6 +81,8 @@ public class ProductResourceIT {
 	// usando
 	// o ObjectMapper
 	public void updateShouldReturnProductDTOWhenIdExists() throws Exception {
+		
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
 
 		ProductDTO productDTO = FactoryProduct.createProductDTO();
 		// Convertendo um objeto java em String
@@ -81,7 +92,9 @@ public class ProductResourceIT {
 		String expectedDescription = productDTO.getDescription();
 
 		// Estou atualizando o valor aqui do produto do id existente
-		ResultActions result = mockMvc.perform(put("/products/{id}", existingId).content(jsonBody)
+		ResultActions result = mockMvc.perform(put("/products/{id}", existingId)
+				.header("Authorization", "Bearer " + accessToken)
+				.content(jsonBody)
 				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
 
 		// Vejo se a resposta veio OK e com os valores esperados
@@ -98,13 +111,17 @@ public class ProductResourceIT {
 	// o ObjectMapper
 	public void updateShouldReturnProductDTOWhenIdDoesNotExist() throws Exception {
 
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
+		
 		ProductDTO productDTO = FactoryProduct.createProductDTO();
 		// Convertendo um objeto java em String
 		String jsonBody = objectMapper.writeValueAsString(productDTO);
 
 
 		// Estou atualizando o valor aqui do produto do id não existente
-		ResultActions result = mockMvc.perform(put("/products/{id}", nonExistingId).content(jsonBody)
+		ResultActions result = mockMvc.perform(put("/products/{id}", nonExistingId)
+				.header("Authorization", "Bearer " + accessToken)
+				.content(jsonBody)
 				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
 
 		// Vejo se a resposta veio como NotFound
